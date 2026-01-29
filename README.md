@@ -287,6 +287,33 @@ The assessment output lives in `.vibe-check/` which you might commit. Here's how
 
 ---
 
+## Vibe Check on Vibe Check
+
+We run vibe-check on itself. Here's the result:
+
+<div align="center">
+
+[![Vibe Check Score](https://img.shields.io/badge/Vibe_Check-100%2F100-22c55e?style=for-the-badge&logo=checkmarx&logoColor=white)](/.vibe-check/)
+[![Status](https://img.shields.io/badge/Status-✓_Ready-22c55e?style=for-the-badge)](/.vibe-check/summary.md)
+
+| | |
+|:--|:--|
+| ![Security](https://img.shields.io/badge/Security-20%2F20-22c55e?style=flat-square) | ![Discoverability](https://img.shields.io/badge/Discoverability-15%2F15-22c55e?style=flat-square) |
+| ![Analytics](https://img.shields.io/badge/Analytics-15%2F15-22c55e?style=flat-square) | ![Platform](https://img.shields.io/badge/Platform-20%2F20-22c55e?style=flat-square) |
+| ![Reliability](https://img.shields.io/badge/Reliability-20%2F20-22c55e?style=flat-square) | ![Legal](https://img.shields.io/badge/Legal-10%2F10-22c55e?style=flat-square) |
+
+</div>
+
+The perfect score comes from being appropriately minimal: zero dependencies (no supply chain risk), no secrets required, no user data collected, and operates entirely on the local filesystem.
+
+<div align="center">
+
+[**View Full Assessment →**](.vibe-check/report.md)
+
+</div>
+
+---
+
 ## License
 
 MIT
