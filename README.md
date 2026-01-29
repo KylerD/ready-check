@@ -314,6 +314,12 @@ The perfect score comes from being appropriately minimal: zero dependencies (no 
 
 ---
 
+## Acknowledgements
+
+The multi-agent architecturem, orchestration patterns and even this README in Vibe Check are heavily inspired by [GSD (Get Shit Done)](https://github.com/glittercowboy/get-shit-done) — a structured planning and execution framework for Claude Code. If you're building AI-assisted workflows with parallel agents and good context engineering principles, check out their approach.
+
+---
+
 ## License
 
 MIT
