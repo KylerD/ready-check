@@ -105,6 +105,118 @@ mkdir -p .vibe-check/analysis
 
 </step>
 
+<step name="assess_scope">
+Count source files to choose exploration mode:
+
+```bash
+# Count non-vendored source files
+git ls-files --cached --others --exclude-standard | grep -v -E "node_modules/|vendor/|dist/|build/|\.git/" | grep -E "\.(ts|tsx|js|jsx|py|rb|go|rs|astro|svelte|vue|html|css|scss)$" | wc -l
+```
+
+- **Under 50 source files → Compact mode** (fewer tool calls, same output)
+- **50+ source files → Standard mode** (full sequential exploration)
+
+Report the chosen mode in your return confirmation.
+</step>
+
+<compact_mode>
+
+**Use this mode when the codebase has fewer than 50 source files.**
+
+Instead of 13 sequential exploration steps, consolidate into three phases:
+
+### Phase A: Single Consolidated Sweep
+
+Run one combined bash command that gathers all signals at once:
+
+```bash
+# === STACK ===
+echo "=== STACK ==="
+ls package.json requirements.txt Cargo.toml go.mod pyproject.toml Gemfile composer.json 2>/dev/null
+cat package.json 2>/dev/null | head -100
+
+# === SECRETS ===
+echo "=== SECRETS ==="
+grep -rn "API_KEY\|SECRET\|PASSWORD\|TOKEN\|PRIVATE" --include="*.ts" --include="*.js" --include="*.tsx" --include="*.py" --include="*.rb" src/ app/ lib/ 2>/dev/null | grep -v "process.env\|os.environ\|ENV\[" | head -30
+grep -rn "process\.env\|os\.environ\|ENV\[" --include="*.ts" --include="*.js" --include="*.py" --include="*.rb" src/ app/ lib/ 2>/dev/null | head -30
+ls -la .env* 2>/dev/null
+git ls-files .env* 2>/dev/null
+grep -n "\.env" .gitignore 2>/dev/null
+
+# === AUTH ===
+echo "=== AUTH ==="
+grep -r "passport\|next-auth\|@auth\|jsonwebtoken\|jose\|bcrypt\|argon2\|devise\|guardian" package.json requirements.txt Gemfile 2>/dev/null
+find . -type f \( -name "*auth*" -o -name "*login*" -o -name "*session*" \) -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -10
+
+# === ERROR HANDLING ===
+echo "=== ERROR HANDLING ==="
+grep -rn "try\s*{" --include="*.ts" --include="*.js" --include="*.tsx" src/ app/ 2>/dev/null | wc -l
+grep -rn "ErrorBoundary\|componentDidCatch\|uncaughtException\|unhandledRejection\|onError\|errorHandler" --include="*.ts" --include="*.js" --include="*.tsx" src/ app/ 2>/dev/null | head -20
+
+# === DEPENDENCIES ===
+echo "=== DEPENDENCIES ==="
+ls -la package-lock.json yarn.lock pnpm-lock.yaml Gemfile.lock poetry.lock Pipfile.lock 2>/dev/null
+if [ -f "package-lock.json" ]; then npm audit 2>/dev/null || true; elif [ -f "yarn.lock" ]; then yarn audit 2>/dev/null || true; elif [ -f "pnpm-lock.yaml" ]; then pnpm audit 2>/dev/null || true; fi
+
+# === INTEGRATIONS ===
+echo "=== INTEGRATIONS ==="
+grep -r "stripe\|twilio\|sendgrid\|aws-sdk\|@google-cloud\|firebase\|supabase\|prisma\|mongoose" package.json requirements.txt 2>/dev/null
+grep -rn "fetch\|axios\|http\|request" --include="*.ts" --include="*.js" --include="*.py" src/ app/ lib/ 2>/dev/null | head -20
+
+# === INFRASTRUCTURE ===
+echo "=== INFRASTRUCTURE ==="
+ls -la Dockerfile docker-compose.yml vercel.json netlify.toml render.yaml fly.toml railway.json 2>/dev/null
+ls -la terraform/ pulumi/ cdk/ k8s/ kubernetes/ helm/ 2>/dev/null
+
+# === DATA ===
+echo "=== DATA ==="
+grep -r "prisma\|mongoose\|sequelize\|typeorm\|drizzle\|pg\|mysql\|sqlite\|redis\|mongodb" package.json requirements.txt 2>/dev/null
+ls -la prisma/schema.prisma db/schema.rb migrations/ alembic/ 2>/dev/null
+grep -rn "DATABASE_URL\|MONGODB_URI\|REDIS_URL" --include="*.ts" --include="*.js" --include="*.py" src/ app/ 2>/dev/null | head -10
+
+# === DISCOVERABILITY ===
+echo "=== DISCOVERABILITY ==="
+grep -rn "<title>\|<meta\s\|og:title\|og:description\|twitter:card\|twitter:title" --include="*.html" --include="*.tsx" --include="*.jsx" --include="*.astro" --include="*.svelte" src/ app/ pages/ 2>/dev/null | head -30
+ls -la sitemap.xml public/sitemap.xml robots.txt public/robots.txt 2>/dev/null
+
+# === ANALYTICS ===
+echo "=== ANALYTICS ==="
+grep -r "gtag\|google-analytics\|@vercel/analytics\|plausible\|posthog\|mixpanel\|amplitude\|segment\|sentry\|bugsnag\|rollbar\|logrocket\|datadog" package.json 2>/dev/null
+grep -rn "gtag\|GoogleAnalytics\|analytics\.\|posthog\|Sentry\|@sentry\|bugsnag" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" src/ app/ 2>/dev/null | head -20
+
+# === LEGAL ===
+echo "=== LEGAL ==="
+find . -type f \( -iname "*privacy*" -o -iname "*terms*" -o -iname "*gdpr*" -o -iname "*tos*" \) -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | head -10
+grep -r "cookie-consent\|cookieconsent\|consent" package.json 2>/dev/null
+grep -rn "delete.*user\|deleteAccount\|removeUser" --include="*.ts" --include="*.js" src/ app/ api/ 2>/dev/null | head -10
+
+# === PLATFORM ===
+echo "=== PLATFORM ==="
+grep -r "auth0\|clerk\|supabase\|firebase\|neon\|planetscale\|upstash\|resend\|sendgrid" package.json 2>/dev/null
+grep -rn "multer\|formidable\|busboy\|upload\|sharp\|jimp\|imagemin" --include="*.ts" --include="*.js" src/ app/ 2>/dev/null | head -10
+
+# === AI SECURITY ===
+echo "=== AI SECURITY ==="
+grep -r "openai\|anthropic\|@ai-sdk\|langchain\|@langchain\|replicate\|cohere\|ai/core" package.json 2>/dev/null
+grep -rn "system.*prompt\|systemPrompt\|SYSTEM_PROMPT\|function.?call\|tools.*\[" --include="*.ts" --include="*.js" src/ app/ lib/ 2>/dev/null | head -20
+```
+
+### Phase B: Direct Reads
+
+Read up to 10 key source files identified from the sweep (config files, main entry points, route handlers, layout files).
+
+### Phase C: Write All Analysis Files
+
+Write all 13 analysis files from the combined results. Apply the same quality standards — file paths, line numbers, code snippets, evidence over judgment.
+
+**The output must be identical in quality and structure to standard mode.** Assessors cannot tell which mode was used.
+
+</compact_mode>
+
+<standard_mode>
+
+The following steps run sequentially. Use this mode for codebases with 50+ source files.
+
 <step name="explore_stack">
 Identify technology stack:
 
@@ -551,11 +663,15 @@ Write `ai-security.md`:
 **If no AI patterns detected:** Write a brief ai-security.md noting "No AI/LLM patterns detected in this codebase. AI Security domain will be skipped."
   </step>
 
+</standard_mode>
+
 <step name="return_confirmation">
 Return ONLY confirmation. DO NOT include analysis contents.
 
 ```markdown
 ## Mapping Complete
+
+**Mode:** {Compact|Standard}
 
 **Analysis files written:**
 
@@ -574,6 +690,13 @@ Return ONLY confirmation. DO NOT include analysis contents.
 - `.vibe-check/analysis/ai-security.md`
 
 **AI patterns detected:** {Yes|No}
+
+**Capabilities detected:**
+- Database: {Yes|No}
+- Auth: {Yes|No}
+- Server/Backend: {Yes|No}
+- Analytics SDK: {Yes|No}
+- AI patterns: {Yes|No}
 
 Ready for domain assessment.
 ```

@@ -12,6 +12,7 @@ CHECKLIST SUMMARY
   ✓ Pass     {N} items
   ✗ Fail     {N} items
   ? Unknown  {N} items
+  ○ N/A      {N} items
   ─────────────────────
   Total      {N} items
 ```
@@ -130,6 +131,16 @@ LOW  ○
 | [Plugin Ecosystem Security](./item-030-plugin-security.md) | {✓/✗/?} | {◆/●/◐/○} | {⚡/½/—} |
 | [Context Isolation](./item-031-context-isolation.md) | {✓/✗/?} | {◆/●/◐/○} | {⚡/½/—} |
 
+### N/A Domains
+
+{For any domain that is entirely N/A, show:}
+
+```
+### {Domain Name} — N/A
+
+○ Excluded from scoring — {brief reason, e.g., "no database detected", "no analytics SDK and stakes are minimal"}
+```
+
 ---
 
 ## Agent-Doable Items
@@ -161,11 +172,12 @@ Read .vibe-check/checklist/item-NNN-{slug}.md and fix it
 | ✓ | Pass — requirement met |
 | ✗ | Fail — action required |
 | ? | Unknown — insufficient data |
+| ○ | N/A — not applicable to this project (in Status column) |
 | ℹ | Info — informational only |
 | ◆ | Critical priority |
 | ● | High priority |
 | ◐ | Medium priority |
-| ○ | Low priority |
+| ○ | Low priority (in Priority column) |
 | ⚡ | Agent can fix completely |
 | ½ | Agent + human effort needed |
 | — | Human action required |

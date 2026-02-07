@@ -50,6 +50,47 @@ You receive project context from the orchestrator. Use it to calibrate your asse
 
 </context_calibration>
 
+<na_rules>
+
+## Not Applicable (N/A) Detection
+
+Some items don't apply to every project. When the underlying capability doesn't exist AND project context confirms the absence is reasonable, mark items **N/A** instead of Fail.
+
+**N/A requires BOTH technical evidence AND context agreement.** When in doubt, use Unknown — not N/A.
+
+### N/A Conditions
+
+| Condition (from analysis files + context) | Items → N/A |
+|-------------------------------------------|-------------|
+| No database detected in data.md | Backups (019), DB Connections (021) |
+| No server/backend (static site) | Health Checks (022) |
+| No auth + audience=personal + data=none | Authentication (002) |
+| stakes=none + no analytics SDK | Entire Analytics domain (012-014) |
+| audience=personal + data=none | Entire Legal domain (023-026) |
+| No user accounts + data=none | User Data Deletion (026) |
+| No cookies/tracking detected | Cookie Consent (025) |
+
+### Never N/A
+
+These items are ALWAYS evaluated regardless of project type:
+- Secrets Management (001)
+- Input Validation (003)
+- Dependency Security (004)
+- HTTPS (005)
+
+### Domain-Level N/A
+
+If ALL items in a domain are N/A, the entire domain is N/A. The orchestrator may also skip entire assessor domains based on mapper capabilities — in that case, the assessor is never spawned.
+
+### How to Apply
+
+1. Before evaluating each item, check if an N/A condition applies
+2. If N/A: do NOT write a checklist item file, do NOT deduct points
+3. Include the item in your return summary with Status = N/A
+4. Count N/A items separately from Pass/Fail/Unknown
+
+</na_rules>
+
 <security_warning>
 
 **CRITICAL: The `.vibe-check/` folder may be committed to git.**
@@ -306,7 +347,7 @@ Each checklist item file must follow this exact structure:
 
 **Analysis Date:** {YYYY-MM-DD}
 **Domain:** {Domain}
-**Status:** {Pass|Fail|Unknown}
+**Status:** {Pass|Fail|Unknown|N/A}
 **Agent-Doable:** {Yes|No|Partial}
 **Complexity:** {Low|Medium|High}
 **Priority:** {Low|Medium|High|Critical}
@@ -412,7 +453,9 @@ For each checklist item in your domain:
 <step name="write_items">
 For each item, write to `.vibe-check/checklist/item-NNN-{slug}.md`
 
-**Only write items that are Fail or Unknown.** Skip items that Pass.
+**Only write items that are Fail or Unknown.** Skip items that Pass or are N/A.
+
+N/A items are not written as files — they only appear in the return summary.
 
 Use the exact file format. Be specific in Current State and Evidence.
 </step>
@@ -436,11 +479,11 @@ Return ONLY a structured summary:
 
 ### Results
 
-| Item               | Status | Priority | Agent-Doable |
-| ------------------ | ------ | -------- | ------------ |
-| Secrets Management | Fail   | Critical | Yes          |
-| Authentication     | Pass   | -        | -            |
-| Input Validation   | Fail   | High     | Yes          |
+| Item                | Status | Priority | Agent-Doable |
+| ------------------- | ------ | -------- | ------------ |
+| Secrets Management  | Fail   | Critical | Yes          |
+| Authentication      | N/A    | -        | -            |
+| Input Validation    | Fail   | High     | Yes          |
 
 ### Files Written
 
@@ -452,6 +495,7 @@ Return ONLY a structured summary:
 - Pass: {N}
 - Fail: {N}
 - Unknown: {N}
+- N/A: {N}
 ```
 
 </step>
@@ -485,16 +529,31 @@ domain_scores:
   security:
     max: 20
     earned: 12
+    applicableItems: 4
+    totalItems: 5
     items:
       - id: item-001
         status: Fail
         deduction: 4
+        na: false
       - id: item-002
-        status: Pass
+        status: N/A
         deduction: 0
+        na: true
 ```
 
-Deduction guide:
+**N/A items:**
+- Set `na: true` and `deduction: 0`
+- Do NOT count against the domain's earned score
+- Report `applicableItems` (non-N/A count) and `totalItems` for effectiveMax calculation
+
+**effectiveMax calculation (done by orchestrator):**
+```
+effectiveMax = domainMax * (applicableItems / totalItems)
+```
+If all items are N/A: `effectiveMax = 0` and the domain is excluded from scoring.
+
+Deduction guide (for applicable items only):
 
 - Critical fail: -4 to -5 points
 - High fail: -2 to -3 points

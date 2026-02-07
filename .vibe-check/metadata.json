@@ -1,53 +1,110 @@
 {
-  "project": "vibe-check",
-  "analysisDate": "2026-01-29",
+  "project": "vibe-check-cc",
+  "analysisDate": "2026-02-07",
   "score": 100,
+  "adjustedEarned": 34,
+  "adjustedMax": 34,
   "band": "Ready",
+  "criticalGate": false,
+  "criticalItems": [],
+  "aiDetected": false,
+  "mapper": {
+    "mode": "Compact"
+  },
   "context": {
-    "description": "CLI plugin for production readiness assessment via Claude Code",
+    "description": "CLI assessment tool for production readiness",
     "audience": "public",
     "dataSensitivity": "none",
     "stakes": "none"
   },
   "categories": {
-    "security": {"earned": 20, "max": 20},
-    "discoverability": {"earned": 15, "max": 15},
-    "analytics": {"earned": 15, "max": 15},
-    "platform": {"earned": 20, "max": 20},
-    "reliability": {"earned": 20, "max": 20},
-    "legal": {"earned": 10, "max": 10}
+    "security": {
+      "earned": 15,
+      "max": 25,
+      "effectiveMax": 15,
+      "na": 2,
+      "applicable": true
+    },
+    "discoverability": {
+      "earned": 0,
+      "max": 20,
+      "effectiveMax": 0,
+      "na": 6,
+      "applicable": false
+    },
+    "analytics": {
+      "earned": 0,
+      "max": 15,
+      "effectiveMax": 0,
+      "na": 3,
+      "applicable": false
+    },
+    "platform": {
+      "earned": 15,
+      "max": 15,
+      "effectiveMax": 15,
+      "na": 0,
+      "applicable": true
+    },
+    "reliability": {
+      "earned": 4,
+      "max": 15,
+      "effectiveMax": 4,
+      "na": 3,
+      "applicable": true
+    },
+    "legal": {
+      "earned": 0,
+      "max": 10,
+      "effectiveMax": 0,
+      "na": 4,
+      "applicable": false
+    },
+    "ai-security": {
+      "earned": 0,
+      "max": 20,
+      "effectiveMax": 0,
+      "na": 5,
+      "applicable": false
+    }
   },
   "checklist": {
-    "pass": 26,
+    "pass": 8,
     "fail": 0,
-    "unknown": 0
+    "unknown": 0,
+    "na": 23
   },
   "items": [
-    {"id": "item-001", "slug": "secrets-management", "status": "Pass", "domain": "security"},
-    {"id": "item-002", "slug": "authentication", "status": "Pass", "domain": "security"},
-    {"id": "item-003", "slug": "input-validation", "status": "Pass", "domain": "security"},
-    {"id": "item-004", "slug": "dependency-security", "status": "Pass", "domain": "security"},
-    {"id": "item-005", "slug": "https", "status": "Pass", "domain": "security"},
-    {"id": "item-006", "slug": "meta-tags", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-007", "slug": "opengraph", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-008", "slug": "twitter-cards", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-009", "slug": "sitemap", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-010", "slug": "robots-txt", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-011", "slug": "semantic-html", "status": "Pass", "domain": "discoverability"},
-    {"id": "item-012", "slug": "visitor-tracking", "status": "Pass", "domain": "analytics"},
-    {"id": "item-013", "slug": "error-tracking", "status": "Pass", "domain": "analytics"},
-    {"id": "item-014", "slug": "conversion-tracking", "status": "Pass", "domain": "analytics"},
-    {"id": "item-015", "slug": "hosting-compatibility", "status": "Pass", "domain": "platform"},
-    {"id": "item-016", "slug": "complexity", "status": "Pass", "domain": "platform"},
-    {"id": "item-017", "slug": "cost-signals", "status": "Pass", "domain": "platform"},
-    {"id": "item-018", "slug": "managed-services", "status": "Pass", "domain": "platform"},
-    {"id": "item-019", "slug": "backups", "status": "Pass", "domain": "reliability"},
-    {"id": "item-020", "slug": "error-handling", "status": "Pass", "domain": "reliability"},
-    {"id": "item-021", "slug": "database-connections", "status": "Pass", "domain": "reliability"},
-    {"id": "item-022", "slug": "health-checks", "status": "Pass", "domain": "reliability"},
-    {"id": "item-023", "slug": "privacy-policy", "status": "Pass", "domain": "legal"},
-    {"id": "item-024", "slug": "terms-of-service", "status": "Pass", "domain": "legal"},
-    {"id": "item-025", "slug": "cookie-consent", "status": "Pass", "domain": "legal"},
-    {"id": "item-026", "slug": "user-deletion", "status": "Pass", "domain": "legal"}
+    {"id": "item-001", "slug": "secrets-management", "title": "Secrets Management", "domain": "security", "status": "Pass", "na": false},
+    {"id": "item-002", "slug": "authentication", "title": "Authentication", "domain": "security", "status": "N/A", "na": true},
+    {"id": "item-003", "slug": "input-validation", "title": "Input Validation", "domain": "security", "status": "Pass", "na": false},
+    {"id": "item-004", "slug": "dependency-security", "title": "Dependency Security", "domain": "security", "status": "Pass", "na": false},
+    {"id": "item-005", "slug": "https", "title": "HTTPS", "domain": "security", "status": "N/A", "na": true},
+    {"id": "item-006", "slug": "meta-tags", "title": "Meta Tags", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-007", "slug": "opengraph", "title": "OpenGraph Tags", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-008", "slug": "twitter-cards", "title": "Twitter Cards", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-009", "slug": "sitemap", "title": "Sitemap", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-010", "slug": "robots-txt", "title": "robots.txt", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-011", "slug": "semantic-html", "title": "Semantic HTML", "domain": "discoverability", "status": "N/A", "na": true},
+    {"id": "item-012", "slug": "visitor-tracking", "title": "Visitor Tracking", "domain": "analytics", "status": "N/A", "na": true},
+    {"id": "item-013", "slug": "error-tracking", "title": "Error Tracking", "domain": "analytics", "status": "N/A", "na": true},
+    {"id": "item-014", "slug": "conversion-tracking", "title": "Conversion Tracking", "domain": "analytics", "status": "N/A", "na": true},
+    {"id": "item-015", "slug": "hosting-compatibility", "title": "Hosting Compatibility", "domain": "platform", "status": "Pass", "na": false},
+    {"id": "item-016", "slug": "complexity", "title": "Complexity Check", "domain": "platform", "status": "Pass", "na": false},
+    {"id": "item-017", "slug": "cost-signals", "title": "Cost Signals", "domain": "platform", "status": "Pass", "na": false},
+    {"id": "item-018", "slug": "managed-services", "title": "Managed Services", "domain": "platform", "status": "Pass", "na": false},
+    {"id": "item-019", "slug": "backups", "title": "Backups", "domain": "reliability", "status": "N/A", "na": true},
+    {"id": "item-020", "slug": "error-handling", "title": "Error Handling", "domain": "reliability", "status": "Pass", "na": false},
+    {"id": "item-021", "slug": "database-connections", "title": "Database Connections", "domain": "reliability", "status": "N/A", "na": true},
+    {"id": "item-022", "slug": "health-checks", "title": "Health Checks", "domain": "reliability", "status": "N/A", "na": true},
+    {"id": "item-023", "slug": "privacy-policy", "title": "Privacy Policy", "domain": "legal", "status": "N/A", "na": true},
+    {"id": "item-024", "slug": "terms-of-service", "title": "Terms of Service", "domain": "legal", "status": "N/A", "na": true},
+    {"id": "item-025", "slug": "cookie-consent", "title": "Cookie Consent", "domain": "legal", "status": "N/A", "na": true},
+    {"id": "item-026", "slug": "user-deletion", "title": "User Data Deletion", "domain": "legal", "status": "N/A", "na": true},
+    {"id": "item-027", "slug": "prompt-injection", "title": "Prompt Injection Prevention", "domain": "ai-security", "status": "N/A", "na": true},
+    {"id": "item-028", "slug": "function-calling", "title": "Function Calling Safety", "domain": "ai-security", "status": "N/A", "na": true},
+    {"id": "item-029", "slug": "websocket-origin", "title": "WebSocket Origin Validation", "domain": "ai-security", "status": "N/A", "na": true},
+    {"id": "item-030", "slug": "plugin-security", "title": "Plugin Ecosystem Security", "domain": "ai-security", "status": "N/A", "na": true},
+    {"id": "item-031", "slug": "context-isolation", "title": "Context Isolation", "domain": "ai-security", "status": "N/A", "na": true}
   ]
 }

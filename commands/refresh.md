@@ -146,8 +146,13 @@ For each OLD item, check if a corresponding NEW item exists (match by slug/topic
 |------------|------------|--------|
 | Fail | Pass (or no new item) | **Improved** — delete old item |
 | Fail | Fail | **Unchanged** — update old item with new findings |
+| Fail | N/A | **Now N/A** — delete old item (capability removed or context changed) |
 | Pass | Fail | **Regressed** — update old item |
+| Pass | N/A | **Now N/A** — note in delta (not a regression) |
 | Unknown | Pass/Fail | **Resolved** — update status |
+| Unknown | N/A | **Now N/A** — delete old item |
+| N/A | Fail | **Now applicable** — treat as new issue |
+| N/A | Pass | **Now applicable** — no action needed |
 | Any | No match | **False positive or N/A** — DELETE the old item |
 
 For NEW items with no OLD match:
@@ -212,6 +217,7 @@ SUMMARY
   ✗ {N} items regressed
   + {N} new issues found
   − {N} false positives removed
+  ○ {N} items now N/A
 
 {If fixed items:}
 IMPROVEMENTS

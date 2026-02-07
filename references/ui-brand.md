@@ -88,11 +88,13 @@ DOMAIN SCORES
 
 Security         ████████████████░░░░  20/25   80%
 Discoverability  ████████████████████  20/20  100%  ✓
-Analytics        ████████░░░░░░░░░░░░   6/15   40%
+Analytics        ○ N/A — not applicable
 Platform         ████████████░░░░░░░░   9/15   60%
-Reliability      ████░░░░░░░░░░░░░░░░   3/15   20%
-Legal            ████████████████████   9/10   90%  ✓
+Reliability      ████████████████████  10/10  100%  ✓
+Legal            ○ N/A — not applicable
 ```
+
+When a domain is entirely N/A, show `○ N/A` with a brief explanation instead of a score bar. Partially N/A domains (some items N/A, some not) still show a bar — the `effectiveMax` reflects only the applicable items.
 
 ---
 
@@ -105,6 +107,7 @@ Legal            ████████████████████   
 | Pass    | `✓`    | Requirement met                 |
 | Fail    | `✗`    | Action required                 |
 | Unknown | `?`    | Insufficient data               |
+| N/A     | `○`    | Not applicable to this project  |
 
 ### Priority Markers
 
@@ -162,8 +165,9 @@ CHECKLIST
   ✓ Pass     12 items
   ✗ Fail      8 items
   ? Unknown   2 items
+  ○ N/A       4 items
   ─────────────────────
-  Total      22 items
+  Total      26 items
 ```
 
 ### Item Lists by Priority
@@ -247,6 +251,22 @@ STILL FAILING
 └─────────────────────────────────────────────┘
 ```
 
+### Critical Gate Warning
+
+When Critical-priority items are failing, show this warning after the score banner:
+
+```
+┌─ WARNING ───────────────────────────────────┐
+│                                             │
+│  ⚠ Critical issues prevent Ready status:    │
+│  • Secrets Management                       │
+│  • Authentication                           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+This appears when `criticalGate = true`. The band is capped at "Needs Work" regardless of score.
+
 ### Next Steps Box
 
 ```
@@ -270,20 +290,21 @@ When displaying results in the terminal (not written to files):
 │                                              │
 │   VIBE CHECK COMPLETE                        │
 │                                              │
-│   Score: 67/100                              │
-│   ██████████████░░░░░░  Needs Work           │
+│   Score: 82/100                              │
+│   █████████████████░░░  ✓ Ready              │
 │                                              │
 └──────────────────────────────────────────────┘
 
-Created .vibe-check/ with 22 checklist items:
-  ✓ 12 passing
-  ✗  8 failing
+Created .vibe-check/ with 26 checklist items:
+  ✓ 14 passing
+  ✗  5 failing
   ?  2 unknown
+  ○  5 not applicable
 
-5 items are agent-doable. Top priorities:
-  ⚡ Secrets Management — move API keys to env vars
+3 items are agent-doable. Top priorities:
   ⚡ Meta Tags — add title and description
   ⚡ Input Validation — add request validation
+  ⚡ OpenGraph Tags — add og: meta tags
 
 ┌─ NEXT ──────────────────────────────────────┐
 │                                             │

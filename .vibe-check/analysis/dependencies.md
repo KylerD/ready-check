@@ -1,28 +1,40 @@
 # Dependencies Analysis
 
-**Scanned:** 2026-01-29
+**Scanned:** 2026-02-07
 
 ## Summary
 
-This project has zero external dependencies. It uses only Node.js built-in modules. No package-lock.json exists because there are no dependencies to lock. No vulnerability audit is possible or needed.
+This project has zero npm dependencies. It uses only Node.js built-in modules. No lock file exists because there are no packages to lock. No vulnerability audit is possible or needed.
 
 ## Findings
 
 ### Lock File
 
-**No lock file present:**
+**None:**
 - No `package-lock.json`
 - No `yarn.lock`
 - No `pnpm-lock.yaml`
-- Not needed — project has no dependencies
+- Reason: No dependencies to lock
 
 ### Dependencies
 
-**File: `package.json`**
+**Zero runtime dependencies:**
+- File: `package.json` has no `dependencies` field
+- Uses only Node.js built-ins: `fs`, `path`, `os`, `readline`
 
-No `dependencies` section exists. The project uses only Node.js built-ins:
+**Zero dev dependencies:**
+- File: `package.json` has no `devDependencies` field
+- No test framework, no linter, no bundler
 
-**bin/install.js imports:**
+### Vulnerability Audit
+
+**Not applicable:**
+- `npm audit` would return empty (no dependencies)
+- No CVEs possible with zero dependencies
+
+### Node.js Built-in Modules Used
+
+**bin/install.js:3-6:**
 ```javascript
 const fs = require('fs');
 const path = require('path');
@@ -30,45 +42,25 @@ const os = require('os');
 const readline = require('readline');
 ```
 
-**scripts/scan-secrets.js imports:**
+**scripts/scan-secrets.js:14-15:**
 ```javascript
 const fs = require('fs');
 const path = require('path');
 ```
 
-### DevDependencies
+### Package Files Distributed
 
-**None:**
-- No `devDependencies` section in package.json
-- No test framework
-- No linter
-- No build tools
-
-### Vulnerability Audit
-
-**Not applicable:**
-- `npm audit` would report "found 0 vulnerabilities"
-- No third-party code to audit
-
-### Dependency Counts
-
-- Production dependencies: 0
-- Development dependencies: 0
-- Total: 0
-
-### Version Constraints
-
-**Node.js engine requirement:**
-- File: `package.json:34-36`
-```json
-"engines": {
-  "node": ">=16.0.0"
-}
-```
+**From package.json `files` field:**
+- `bin/`
+- `commands/`
+- `agents/`
+- `references/`
+- `templates/`
+- `README.md`
 
 ## Evidence Files
 
 Key files examined:
-- `package.json` — No dependencies defined
-- `bin\install.js` — Uses only Node.js built-ins
-- `scripts\scan-secrets.js` — Uses only Node.js built-ins
+- `package.json` - No dependencies declared
+- `bin/install.js:3-6` - Built-in module imports
+- `scripts/scan-secrets.js:14-15` - Built-in module imports

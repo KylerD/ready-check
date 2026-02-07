@@ -1,70 +1,57 @@
 # Integrations Analysis
 
-**Scanned:** 2026-01-29
+**Scanned:** 2026-02-07
 
 ## Summary
 
-This project integrates with Claude Code's plugin system. It does not make external API calls or connect to third-party services. All operations are local filesystem-based.
+No external service integrations exist. This is a local-only CLI tool that reads and writes files on the local filesystem. It makes no network requests and has no API dependencies.
 
 ## Findings
 
 ### External Services
 
 **None:**
-- No external API calls
-- No third-party service integrations
-- No network requests in source code
+- No Stripe, Twilio, SendGrid, or payment/messaging SDKs
+- No AWS, GCP, or cloud provider SDKs
+- No Firebase, Supabase, or BaaS SDKs
+- No database clients
 
-### Claude Code Integration
-
-**Hook System:**
-- File: `hooks\hooks.json:4-16`
-- Integrates with Claude Code's PreToolUse hook system
-- Intercepts Write and Edit tool calls
-- Runs secret scanner before allowing writes to .vibe-check/
-
-**Command System:**
-- Installs slash commands to `~/.claude/commands/vibe-check/`
-- Commands: check, fix, refresh, discuss, help, map-codebase
-
-**Agent System:**
-- Installs agent definitions to `~/.claude/agents/`
-- Agents: vibe-mapper, vibe-assessor, vibe-fixer
-
-### SDK/Client Libraries
+### API Calls
 
 **None:**
-- No external SDKs
-- No API clients
-- No database clients
+- No `fetch`, `axios`, `http`, or `request` usage
+- No network requests of any kind
+- Tool operates entirely on local filesystem
 
 ### Webhook Handlers
 
 **None:**
 - No webhook endpoints
-- Not a web service
+- Not a server application
 
-### API Endpoints Called
+### External URLs
 
-**None:**
-- No `fetch`, `axios`, or `http` calls
-- All operations are local
+**None in code:**
+- No hardcoded API endpoints
+- No external service URLs
+
+### File Operations
+
+**Local filesystem only:**
+- File: `bin/install.js`
+- Operations: `fs.readFileSync`, `fs.writeFileSync`, `fs.existsSync`, `fs.mkdirSync`, `fs.rmSync`, `fs.copyFileSync`, `fs.unlinkSync`, `fs.readdirSync`
+- Scope: `~/.claude` (global) or `./.claude` (local) directories only
 
 ### GitHub Integration
 
-**Repository metadata only:**
-- File: `package.json:23-25`
-```json
-"repository": {
-  "type": "git",
-  "url": "https://github.com/kylerd/vibe-check.git"
-}
-```
-- No runtime GitHub API calls
+**Repository URL only:**
+- File: `package.json:18-21`
+- URL: `https://github.com/kylerd/vibe-check.git`
+- Purpose: npm package metadata, not runtime integration
 
 ## Evidence Files
 
 Key files examined:
-- `hooks\hooks.json` — Claude Code hook configuration
-- `bin\install.js` — Local filesystem operations only
-- `package.json` — Repository URL for npm metadata
+- `package.json` - No integration dependencies
+- `bin/install.js` - Local filesystem operations only
+- `scripts/scan-secrets.js` - stdin/stdout only

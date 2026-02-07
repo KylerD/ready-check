@@ -14,6 +14,18 @@
 **Project:** {Project Name}
 **Analysis Date:** {YYYY-MM-DD}
 
+{If criticalGate is true, show immediately after the banner:}
+
+```
+┌─ WARNING ───────────────────────────────────┐
+│                                             │
+│  ⚠ Critical issues prevent Ready status:    │
+│  • {critical item title}                    │
+│  • {critical item title}                    │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
 ---
 
 ## Overview
@@ -43,13 +55,15 @@ DOMAIN SCORES
 ```
 
 ```
-Security         {bar}  {earned}/{max}  {pct}%  {status}
-Discoverability  {bar}  {earned}/{max}  {pct}%  {status}
-Analytics        {bar}  {earned}/{max}  {pct}%  {status}
-Platform         {bar}  {earned}/{max}  {pct}%  {status}
-Reliability      {bar}  {earned}/{max}  {pct}%  {status}
-Legal            {bar}  {earned}/{max}  {pct}%  {status}
+Security         {bar}  {earned}/{effectiveMax}  {pct}%  {status}
+Discoverability  {bar}  {earned}/{effectiveMax}  {pct}%  {status}
+Analytics        ○ N/A — not applicable
+Platform         {bar}  {earned}/{effectiveMax}  {pct}%  {status}
+Reliability      {bar}  {earned}/{effectiveMax}  {pct}%  {status}
+Legal            ○ N/A — not applicable
 ```
+
+{Show N/A domains with `○` and no bar. Show applicable domains with their effectiveMax (which accounts for any individual N/A items within the domain).}
 
 ---
 
@@ -62,6 +76,7 @@ CHECKLIST
   ✓ Pass     {N} items
   ✗ Fail     {N} items
   ? Unknown  {N} items
+  ○ N/A      {N} items
   ─────────────────────
   Total      {N} items
 ```

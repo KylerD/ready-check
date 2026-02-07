@@ -1,75 +1,72 @@
 # Legal Analysis
 
-**Scanned:** 2026-01-29
+**Scanned:** 2026-02-07
 
 ## Summary
 
-This project is an MIT-licensed open source CLI tool. It does not collect user data, does not require user accounts, and operates entirely locally. Standard open source legal considerations apply.
+MIT license declared in package.json. No privacy policy, terms of service, or cookie consent - not applicable for a local CLI tool that collects no user data and has no web presence.
 
 ## Findings
 
+### License
+
+**MIT License:**
+- File: `package.json:10`
+- License: `"license": "MIT"`
+- Standard permissive open source license
+
 ### Privacy Policy
 
-**Not applicable:**
-- No user data collection
-- No network requests
-- No accounts or personal information handled
-- Operates entirely on local filesystem
+**None:**
+- No privacy policy file
+- No privacy policy route/page
+- Not applicable - tool collects no user data
 
 ### Terms of Service
 
-**Not applicable:**
-- Not a service
-- Open source CLI tool
-- MIT license covers usage terms
-
-### License
-
-**File: `package.json:8`**
-```json
-"license": "MIT"
-```
-
-- MIT license declared in package.json
-- Permissive open source license
-- No LICENSE file found in repository root (should be added)
+**None:**
+- No terms of service file
+- No terms route/page
+- Not applicable for open source CLI tool
 
 ### Cookie Consent
 
-**Not applicable:**
-- No web application
-- No cookies
-- No tracking
+**None:**
+- No cookie consent library
+- No cookies used
+- Not applicable - no web interface
 
-### User Data Deletion
+### User Deletion
 
 **Not applicable:**
+- No user accounts
 - No user data stored
-- No accounts
-- No personal information collected
+- Tool only creates local files in user's own directory
 
 ### Data Export
 
 **Not applicable:**
 - No user data to export
+- Generated reports are already local files
 
-### Third-Party Data Processing
-
-**None:**
-- Does not send data to external services
-- All processing happens locally
-- Assessment output stays on user's machine
-
-### GDPR/CCPA Compliance
+### GDPR Compliance
 
 **Not applicable:**
-- No personal data processing
-- No EU/CA data subject concerns
-- Local CLI tool with no data transmission
+- No personal data collection
+- No tracking
+- No cookies
+- No user accounts
+
+### Data Created by Tool
+
+**Local files only:**
+- `.claude/` directory with configuration
+- `.vibe-check/` directory with assessment reports
+- All data stays on user's machine
+- User has full control to delete at any time
 
 ## Evidence Files
 
 Key files examined:
-- `package.json` — MIT license declaration
-- `README.md` — License section at bottom
-- `bin\install.js` — No data collection code
+- `package.json:10` - MIT license
+- `bin/install.js` - No data collection

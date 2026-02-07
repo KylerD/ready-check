@@ -1,7 +1,7 @@
 # Checklist
 
-**Project:** vibe-check
-**Analysis Date:** 2026-01-29
+**Project:** vibe-check-cc
+**Analysis Date:** 2026-02-07
 
 ---
 
@@ -9,78 +9,67 @@
 CHECKLIST SUMMARY
 ─────────────────────────────────────────────────
 
-  ✓ Pass     26 items
+  ✓ Pass      8 items
   ✗ Fail      0 items
   ? Unknown   0 items
+  ○ N/A      23 items
   ─────────────────────
-  Total      26 items
+  Total      31 items
 ```
 
 ---
 
-## All Items Pass
+## By Priority
 
-No failing or unknown items to display by priority. All 26 checklist items pass.
+All items are either passing or N/A. No failing items to prioritize.
 
 ---
 
 ## By Domain
 
-### Security (5/5 passing)
+### Security
 
 | Item | Status | Priority | Agent |
 |------|--------|----------|-------|
 | Secrets Management | ✓ | — | — |
-| Authentication | ✓ | — | — |
+| Authentication | ○ N/A | — | — |
 | Input Validation | ✓ | — | — |
 | Dependency Security | ✓ | — | — |
-| HTTPS | ✓ | — | — |
+| HTTPS | ○ N/A | — | — |
 
-### Discoverability (6/6 passing)
+### Discoverability — N/A
 
-| Item | Status | Priority | Agent |
-|------|--------|----------|-------|
-| Meta Tags | ✓ | — | — |
-| OpenGraph Tags | ✓ | — | — |
-| Twitter Cards | ✓ | — | — |
-| Sitemap | ✓ | — | — |
-| robots.txt | ✓ | — | — |
-| Semantic HTML | ✓ | — | — |
+○ Excluded from scoring — CLI tool with no web presence. Discoverability happens via npm registry and GitHub.
 
-### Analytics (3/3 passing)
+### Analytics — N/A
 
-| Item | Status | Priority | Agent |
-|------|--------|----------|-------|
-| Visitor Tracking | ✓ | — | — |
-| Error Tracking | ✓ | — | — |
-| Conversion Tracking | ✓ | — | — |
+○ Excluded from scoring — No analytics SDK and stakes are minimal.
 
-### Platform (4/4 passing)
+### Platform
 
 | Item | Status | Priority | Agent |
 |------|--------|----------|-------|
 | Hosting Compatibility | ✓ | — | — |
 | Complexity Check | ✓ | — | — |
 | Cost Signals | ✓ | — | — |
-| Managed Services | ℹ | ○ | — |
+| Managed Services | ✓ | — | — |
 
-### Reliability (4/4 passing)
+### Reliability
 
 | Item | Status | Priority | Agent |
 |------|--------|----------|-------|
-| Backups | ✓ | — | — |
+| Backups | ○ N/A | — | — |
 | Error Handling | ✓ | — | — |
-| Database Connections | ✓ | — | — |
-| Health Checks | ✓ | — | — |
+| Database Connections | ○ N/A | — | — |
+| Health Checks | ○ N/A | — | — |
 
-### Legal (4/4 passing)
+### Legal — N/A
 
-| Item | Status | Priority | Agent |
-|------|--------|----------|-------|
-| Privacy Policy | ✓ | — | — |
-| Terms of Service | ✓ | — | — |
-| Cookie Consent | ✓ | — | — |
-| User Data Deletion | ✓ | — | — |
+○ Excluded from scoring — Side project handling no user data.
+
+### AI Security — N/A
+
+○ Excluded from scoring — No AI patterns detected.
 
 ---
 
@@ -91,7 +80,7 @@ QUICK WINS  ⚡
 ═══════════════════════════════════════════════
 ```
 
-No failing items to fix.
+No items need fixing — all applicable checks pass.
 
 ---
 
@@ -102,11 +91,12 @@ No failing items to fix.
 | ✓ | Pass — requirement met |
 | ✗ | Fail — action required |
 | ? | Unknown — insufficient data |
+| ○ | N/A — not applicable to this project (in Status column) |
 | ℹ | Info — informational only |
 | ◆ | Critical priority |
 | ● | High priority |
 | ◐ | Medium priority |
-| ○ | Low priority |
+| ○ | Low priority (in Priority column) |
 | ⚡ | Agent can fix completely |
 | ½ | Agent + human effort needed |
 | — | Human action required |

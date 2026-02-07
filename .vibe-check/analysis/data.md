@@ -1,75 +1,63 @@
 # Data Analysis
 
-**Scanned:** 2026-01-29
+**Scanned:** 2026-02-07
 
 ## Summary
 
-This project does not use a database. It operates entirely on the local filesystem, reading and writing markdown and JSON files. The generated assessment output is stored in `.vibe-check/` in the target project.
+No database usage in this project. Data is stored as local markdown and JSON files. The tool reads/writes to user's filesystem in `.claude/` directories. No migrations, backups, or connection strings.
 
 ## Findings
 
 ### Database
 
 **None:**
-- No database client libraries
-- No database connection code
-- No schema files
-- No migrations
+- No Prisma, Mongoose, Sequelize, TypeORM, or Drizzle
+- No PostgreSQL, MySQL, SQLite, or MongoDB clients
+- No Redis or caching layer
+
+### Schema/Migrations
+
+**None:**
+- No `prisma/schema.prisma`
+- No `migrations/` directory
+- No database schema files
 
 ### Data Storage
 
-**Local filesystem only:**
-- Reads from user's Claude Code config directory
-- Writes assessment output to `.vibe-check/` in target project
+**Local filesystem (JSON/Markdown):**
 
-**Output structure (written by agents, not this tool directly):**
-```
-.vibe-check/
-├── summary.md
-├── report.md
-├── action-plan.md
-├── metadata.json
-├── analysis/
-│   └── *.md
-└── checklist/
-    ├── index.md
-    └── item-*.md
-```
+**JSON files:**
+- `scripts/secret-patterns.json` - Secret detection patterns (read-only)
+- `~/.claude/settings.json` - Claude settings (read/write)
 
-### Configuration Data
+**Markdown files:**
+- Input: Agent configs, templates, commands (read-only)
+- Output: `.vibe-check/` directory with analysis results
 
-**File: `scripts\secret-patterns.json`**
-- Static JSON file with 50+ regex patterns
-- Read at runtime by secret scanner
+### Connection Strings
 
-**File: `hooks\hooks.json`**
-- Hook configuration
-- Installed to user's Claude config
+**None:**
+- No `DATABASE_URL`
+- No `MONGODB_URI`
+- No `REDIS_URL`
 
 ### Backup Configuration
 
-**Not applicable:**
-- No persistent data store
-- Generated output can be regenerated
-- Users may git-commit `.vibe-check/` if desired
+**None:**
+- No backup scripts
+- No dump/restore functionality
+- Data is user-managed local files
 
-### Connection Handling
+### Data Flow
 
-**Not applicable:**
-- No database connections
-- No connection pooling
-- No retry logic needed
-
-### Data Persistence
-
-**File-based:**
-- Assessment results written as markdown/JSON files
-- Metadata stored in `metadata.json` for machine-readable access
-- Files can be committed to git for tracking over time
+1. User runs `npx vibe-check-cc`
+2. Tool copies markdown files to `~/.claude/` or `./.claude/`
+3. Claude Code reads these files when user runs `/vibe-check:check`
+4. Assessment results written to `.vibe-check/` in project directory
 
 ## Evidence Files
 
 Key files examined:
-- `package.json` — No database dependencies
-- `scripts\secret-patterns.json` — Static configuration data
-- `templates\` — Output file templates
+- `package.json` - No database dependencies
+- `bin/install.js` - Local file operations only
+- `scripts/secret-patterns.json` - Static JSON data

@@ -65,6 +65,8 @@ SCORE BANDS
         Critical gaps must be addressed
 ```
 
+Items marked N/A are excluded from the scoring pool. If any Critical-priority item is failing, the band is capped at "Needs Work" regardless of score.
+
 ---
 
 ## Symbol Legend
@@ -74,10 +76,11 @@ SCORE BANDS
 | ✓ | Pass — requirement met |
 | ✗ | Fail — action required |
 | ? | Unknown — insufficient data |
+| ○ | N/A — not applicable (in Status column) |
 | ◆ | Critical priority |
 | ● | High priority |
 | ◐ | Medium priority |
-| ○ | Low priority |
+| ○ | Low priority (in Priority column) |
 | ⚡ | Agent can fix completely |
 | ½ | Agent + human effort |
 | — | Human action required |

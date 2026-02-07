@@ -83,11 +83,11 @@ Each checklist item includes:
 
 The system:
 1. **Asks context** — What you're building, who it's for, what data you handle, what's at stake
-2. **Maps your codebase** — Spawns an agent to analyze secrets, auth, errors, dependencies, infrastructure
-3. **Assesses domains** — Parallel agents evaluate security, discoverability, analytics, platform, reliability, legal (calibrated to your context)
+2. **Maps your codebase** — Spawns an agent to analyze secrets, auth, errors, dependencies, infrastructure, and detect capabilities (database, auth, analytics, etc.)
+3. **Assesses domains** — Parallel agents evaluate security, discoverability, analytics, platform, reliability, legal (calibrated to your context). Domains that don't apply are automatically skipped.
 4. **Writes results** — Score, report, prioritized action plan
 
-You get a score out of 100 and a clear breakdown of what needs attention.
+You get a score out of 100 and a clear breakdown of what needs attention. Small codebases (<50 files) get a fast-path mapper that cuts assessment time significantly.
 
 ### 2. Discuss the Findings
 
@@ -148,6 +148,8 @@ Re-runs the assessment and shows what improved or regressed since last check.
 | 70-100 | **Ready** | Production-ready with minor improvements |
 | 40-69 | **Needs Work** | Significant gaps to address |
 | 0-39 | **Not Ready** | Critical issues that must be fixed |
+
+Domains and items that don't apply to your project (no database, no analytics, etc.) are automatically marked **N/A** and excluded from scoring — so your score reflects reality for *your* project type. If any Critical-priority item is failing, the band is capped at "Needs Work" regardless of score.
 
 ---
 

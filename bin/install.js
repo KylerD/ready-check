@@ -375,7 +375,10 @@ function install(isGlobal) {
   console.log(`  ${green}✓${reset} Installed secret scanner hook`);
 
   console.log(`
-  ${green}Done!${reset} Launch Claude Code and run ${cyan}/vibe-check:check${reset}
+  ${green}Done!${reset} Run ${cyan}/vibe-check:check${reset} to start.
+
+  ${yellow}NOTE:${reset} If Claude Code is already running, ${cyan}restart your session${reset}
+  for slash commands to register. New sessions pick them up automatically.
 
   ${yellow}Commands:${reset}
     /vibe-check:check        Run full assessment

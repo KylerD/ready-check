@@ -70,11 +70,20 @@ Pass references to agents so they maintain consistent voice and visual style.
 
 ### Phase 1: Setup
 
-Create output directory:
+Create output directories. If `.vibe-check/` already exists from a previous run, clean it out first to avoid stale data mixing with fresh results:
 
 ```bash
-mkdir -p .vibe-check/checklist
+# Remove previous assessment if it exists
+if [ -d ".vibe-check" ]; then
+  rm -rf .vibe-check/analysis .vibe-check/checklist
+  rm -f .vibe-check/metadata.json .vibe-check/summary.md .vibe-check/report.md .vibe-check/action-plan.md .vibe-check/README.md
+fi
+
+# Create all required directories
+mkdir -p .vibe-check/checklist .vibe-check/analysis
 ```
+
+**This step is required before any agents run or any files are written.** If directories don't exist, Write tool calls will fail.
 
 ### Phase 2: User Input
 
@@ -185,13 +194,33 @@ Explore this codebase and write analysis files to .vibe-check/analysis/
 Return confirmation only when complete.
 ```
 
-Wait for confirmation. The mapper writes 12 analysis files covering stack, secrets, auth, error handling, logging, monitoring, environments, CI/CD, dependencies, integrations, infrastructure, and data.
+Wait for confirmation. The mapper writes 13 analysis files and returns:
+- **Mode** (Compact or Standard)
+- **AI patterns detected** (Yes/No)
+- **Capabilities detected** (Database, Auth, Server/Backend, Analytics SDK, AI patterns)
 
-**Do not read the analysis files.** The assessors will read them.
+**Do not read the analysis files.** The assessors will read them. Use the capabilities summary to decide which assessors to skip (Phase 4).
 
 ### Phase 4: Domain Assessment
 
-Spawn `vibe-assessor` agents for each domain group. These can run in parallel:
+Spawn `vibe-assessor` agents for each domain group. These can run in parallel.
+
+**Conditional domain skipping based on mapper capabilities + user context:**
+
+Use the mapper's capabilities summary to skip entire assessor domains when the domain cannot apply. This extends the existing AI Security pattern:
+
+| Condition | Skip |
+|-----------|------|
+| AI patterns: No | AI Security domain (existing behavior) |
+| stakes=none + Analytics SDK: No | Analytics domain → mark all items N/A |
+| audience=personal + data=none | Legal domain → mark all items N/A |
+
+When a domain is skipped:
+- Do NOT spawn the assessor
+- Record all items as N/A in metadata
+- Set `effectiveMax: 0` for that category
+
+Individual item-level N/A detection (e.g., no database → Backups N/A) is handled within assessors using the `<na_rules>` in their instructions. Pass mapper capabilities in the context block so assessors can reference them.
 
 **Security Assessor:**
 
@@ -207,6 +236,13 @@ Project context (calibrate your assessment accordingly):
 - Data sensitivity: {none|accounts|payments|sensitive}
 - Stakes: {none|low|medium|high}
 
+Mapper capabilities:
+- Database: {Yes|No}
+- Auth: {Yes|No}
+- Server/Backend: {Yes|No}
+- Analytics SDK: {Yes|No}
+- AI patterns: {Yes|No}
+
 Load these analysis files:
 - .vibe-check/analysis/secrets.md
 - .vibe-check/analysis/auth.md
@@ -218,13 +254,13 @@ Load references:
 - references/domains.md
 - references/agent-classification.md
 
-Evaluate: Secrets Management, Authentication, Input Validation, Dependency Security, Rate Limiting
+Evaluate: Secrets Management, Authentication, Input Validation, Dependency Security, HTTPS
 
 Write failing/unknown items to .vibe-check/checklist/
 Return score summary only.
 ```
 
-**Pass context to all assessors.** They use it to calibrate:
+**Pass context AND mapper capabilities to all assessors.** They use context to calibrate and capabilities to detect N/A items:
 - Personal tool with no sensitive data → relax on legal, simpler auth is fine
 - Public app handling payments → strict on everything
 - Side project → focus on critical issues only
@@ -290,6 +326,13 @@ Project context (calibrate your assessment accordingly):
 - Data sensitivity: {none|accounts|payments|sensitive}
 - Stakes: {none|low|medium|high}
 
+Mapper capabilities:
+- Database: {Yes|No}
+- Auth: {Yes|No}
+- Server/Backend: {Yes|No}
+- Analytics SDK: {Yes|No}
+- AI patterns: {Yes|No}
+
 Load these analysis files:
 - .vibe-check/analysis/ai-security.md
 - .vibe-check/analysis/auth.md
@@ -315,34 +358,62 @@ Collect score summaries from each assessor.
 
 You now have:
 
-- Score contributions from each assessor
+- Score contributions from each assessor (including N/A counts)
 - List of checklist item files written
+- Mapper capabilities
 
 Calculate total score and write final files:
 
+#### Scoring
+
+**N/A-adjusted scoring:**
+
+For each domain, calculate `effectiveMax` based on how many items are applicable:
+
+```
+Per domain with some N/A items:
+  effectiveMax = domainMax * (applicableItems / totalItems)
+
+Per domain entirely N/A (or skipped):
+  effectiveMax = 0, excluded from scoring
+
+adjustedEarned = sum of earned across applicable domains only
+adjustedMax = sum of effectiveMax across applicable domains only
+
+normalizedScore = round((adjustedEarned / adjustedMax) * 100)
+```
+
+This ensures projects aren't penalized for capabilities they don't have (no database, no analytics, etc.).
+
+**Critical gate:**
+
+After calculating the score, check for critical failures:
+
+```
+If ANY item has status=Fail AND priority=Critical:
+  Band is capped at "Needs Work" regardless of score.
+  criticalGate = true
+  criticalItems = [list of Critical-priority Fail items]
+```
+
+Only Critical-priority items gate the band. High/Medium/Low are reflected in the score but don't cap the band.
+
 #### metadata.json
-
-**Scoring with AI Security domain:**
-
-When AI patterns are detected, the total max points is 120 (100 base + 20 AI Security). Normalize the final score to 100:
-
-```
-rawScore = sum of all earned points
-maxPoints = 100 (no AI) or 120 (with AI)
-normalizedScore = round((rawScore / maxPoints) * 100)
-```
-
-This ensures projects with AI capabilities are assessed more rigorously while maintaining comparable scores.
 
 ```json
 {
   "project": "{from package.json name or directory}",
   "analysisDate": "{YYYY-MM-DD}",
   "score": {normalizedScore},
-  "rawScore": {rawScore},
-  "maxPoints": {100 or 120},
+  "adjustedEarned": {adjustedEarned},
+  "adjustedMax": {adjustedMax},
   "band": "{Not Ready|Needs Work|Ready}",
+  "criticalGate": {true|false},
+  "criticalItems": ["{item-NNN title}", ...],
   "aiDetected": {true|false},
+  "mapper": {
+    "mode": "{Compact|Standard}"
+  },
   "context": {
     "description": "{what they said it does}",
     "audience": "{personal|known|public}",
@@ -350,26 +421,32 @@ This ensures projects with AI capabilities are assessed more rigorously while ma
     "stakes": "{none|low|medium|high}"
   },
   "categories": {
-    "security": {"earned": N, "max": 25},
-    "discoverability": {"earned": N, "max": 20},
-    "analytics": {"earned": N, "max": 15},
-    "platform": {"earned": N, "max": 15},
-    "reliability": {"earned": N, "max": 15},
-    "legal": {"earned": N, "max": 10},
-    "ai-security": {"earned": N, "max": 20, "applicable": true|false}
+    "security": {"earned": N, "max": 25, "effectiveMax": N, "na": N, "applicable": true},
+    "discoverability": {"earned": N, "max": 20, "effectiveMax": N, "na": N, "applicable": true},
+    "analytics": {"earned": N, "max": 15, "effectiveMax": N, "na": N, "applicable": true|false},
+    "platform": {"earned": N, "max": 15, "effectiveMax": N, "na": N, "applicable": true},
+    "reliability": {"earned": N, "max": 15, "effectiveMax": N, "na": N, "applicable": true},
+    "legal": {"earned": N, "max": 10, "effectiveMax": N, "na": N, "applicable": true|false},
+    "ai-security": {"earned": N, "max": 20, "effectiveMax": N, "na": N, "applicable": true|false}
   },
   "checklist": {
     "pass": N,
     "fail": N,
-    "unknown": N
+    "unknown": N,
+    "na": N
   },
   "items": [
-    {"id": "item-001", "slug": "secrets-management", "status": "Fail", ...}
+    {"id": "item-001", "slug": "secrets-management", "status": "Fail", "na": false, ...},
+    {"id": "item-002", "slug": "authentication", "status": "N/A", "na": true, ...}
   ]
 }
 ```
 
-**Note:** When `ai-security.applicable` is false, the category is excluded from scoring calculations.
+**Notes:**
+- When a category has `applicable: false`, it is entirely excluded from scoring (effectiveMax = 0)
+- `na` count per category shows how many items were marked N/A
+- `criticalGate` is true when Critical fails cap the band at "Needs Work"
+- `criticalItems` lists the titles of Critical-priority Fail items (empty array if none)
 
 #### summary.md
 
@@ -425,10 +502,20 @@ Use the visual patterns from `references/ui-brand.md`. Display summary with the 
 │                                              │
 └──────────────────────────────────────────────┘
 
+{If criticalGate is true:}
+┌─ WARNING ───────────────────────────────────┐
+│                                             │
+│  ⚠ Critical issues prevent Ready status:    │
+│  • {critical item title}                    │
+│  • {critical item title}                    │
+│                                             │
+└─────────────────────────────────────────────┘
+
 Created .vibe-check/ with {N} checklist items:
   ✓ {pass} passing
   ✗ {fail} failing
   ? {unknown} unknown
+  ○ {na} not applicable
 
 {If agent-doable items exist:}
 {N} items are agent-doable. Top priorities:
@@ -469,6 +556,10 @@ Use AskUserQuestion with these options. Based on their choice:
 - **0-39:** Not Ready — Critical gaps that must be addressed
 - **40-69:** Needs Work — Significant improvements needed
 - **70-100:** Ready — Production-ready with minor improvements
+
+**N/A items are excluded from the scoring pool.** A project with 4 N/A items is scored against the remaining applicable items only.
+
+**Critical gate:** If any item has status=Fail and priority=Critical, the band is capped at "Needs Work" regardless of score.
 
 ## Orchestrator Rules
 

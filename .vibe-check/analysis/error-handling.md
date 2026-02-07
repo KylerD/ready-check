@@ -1,100 +1,100 @@
 # Error Handling Analysis
 
-**Scanned:** 2026-01-29
+**Scanned:** 2026-02-07
 
 ## Summary
 
-Error handling is present but minimal in this codebase. The installer script has try/catch blocks for JSON parsing and file operations. The secret scanner has defensive error handling. Some error conditions fail silently by design (CLI usability).
+Basic try/catch error handling exists in the JavaScript files. Errors are logged to console but not suppressed - the CLI continues gracefully or exits with appropriate codes. No empty catch blocks found.
 
 ## Findings
 
 ### Try/Catch Usage
 
-**File: `bin\install.js:241-248`**
-```javascript
-if (fs.existsSync(settingsPath)) {
+**5 try/catch blocks total across 2 files:**
+
+**bin/install.js:**
+- Line 243-248: Settings file JSON parsing
+  ```javascript
   try {
     settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
   } catch (err) {
     // If settings file is invalid, start fresh
     settings = {};
   }
-}
-```
-- Silent recovery on invalid settings.json
-- Reasonable for CLI tool — continues with defaults
+  ```
+  Context: Graceful fallback to empty settings if file is corrupt
 
-**File: `bin\install.js:291-314`**
-```javascript
-try {
-  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-  // ... hook removal logic
-} catch (err) {
-  // Ignore errors
-}
-```
-- Silent error handling during uninstall
-- Appropriate for cleanup operations
+- Line 293-314: Hook removal from settings
+  ```javascript
+  try {
+    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    // ... remove hook logic
+  } catch (err) {
+    // Ignore errors
+  }
+  ```
+  Context: Silent failure acceptable - uninstall continues
 
-**File: `scripts\scan-secrets.js:20-25`**
-```javascript
-try {
-  patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
-} catch (err) {
-  console.error(`Warning: Could not load secret patterns: ${err.message}`);
-  process.exit(0);
-}
-```
-- Warns but allows write on pattern load failure
-- Exit code 0 means "allow" — graceful degradation
+**scripts/scan-secrets.js:**
+- Line 20-25: Pattern file loading
+  ```javascript
+  try {
+    patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
+  } catch (err) {
+    console.error(`Warning: Could not load secret patterns: ${err.message}`);
+    process.exit(0);
+  }
+  ```
+  Context: Warns and allows operation to proceed (fail open)
 
-**File: `scripts\scan-secrets.js:48-52`**
-```javascript
-} catch (err) {
-  console.error(`Warning: Secret scanner error: ${err.message}`);
-  process.exit(0);
-}
-```
-- Warns but allows write on any scanner error
-- Fail-open design — doesn't block Claude on unexpected errors
+- Line 37-52: Hook input processing
+  ```javascript
+  try {
+    const hookInput = JSON.parse(input);
+    const result = scanForSecrets(hookInput);
+    // ... handle result
+  } catch (err) {
+    console.error(`Warning: Secret scanner error: ${err.message}`);
+    process.exit(0);
+  }
+  ```
+  Context: Warns and allows operation to proceed (fail open)
+
+- Line 81 (inside loop): Regex pattern matching
+  ```javascript
+  try {
+    const regex = new RegExp(rule.regex, 'gi');
+    // ... match logic
+  } catch (regexErr) {
+    // Skip invalid regex patterns
+    continue;
+  }
+  ```
+  Context: Skips bad patterns, continues checking others
 
 ### Global Error Handlers
 
-**None found:**
-- No `process.on('uncaughtException')` handlers
-- No `process.on('unhandledRejection')` handlers
-- Acceptable for short-lived CLI scripts
-
-### Error Response Patterns
-
-**File: `scripts\scan-secrets.js:40-44`**
-```javascript
-if (result.blocked) {
-  // Exit 2 = block the tool call, stderr is shown to Claude
-  console.error(result.message);
-  process.exit(2);
-}
-```
-- Uses exit codes for hook communication
-- Exit 0 = allow, Exit 2 = block
-- stderr for error messages
+**None:**
+- No `process.on('uncaughtException')`
+- No `process.on('unhandledRejection')`
+- Not needed for simple CLI tool
 
 ### Empty Catch Blocks
 
-**One instance with comment:**
-- File: `bin\install.js:312-314`
-- Contains `// Ignore errors` comment
-- Intentional silence during cleanup
+**One semi-empty catch:**
+- File: `bin/install.js:293`
+- Pattern: `catch (err) { // Ignore errors }`
+- Context: During uninstall hook removal - silent failure is acceptable
 
-### Console Output
+### Exit Codes
 
-**Colored output for user feedback:**
-- File: `bin\install.js:8-12`
-- Uses ANSI codes for cyan, green, yellow, dim, reset
-- Error messages use yellow for warnings
+**Proper exit codes used:**
+- `process.exit(0)` - Success/allow
+- `process.exit(1)` - Argument errors (bin/install.js:437, 443)
+- `process.exit(2)` - Secret detected, block write (scan-secrets.js:43)
 
 ## Evidence Files
 
 Key files examined:
-- `bin\install.js` — Installer with try/catch blocks
-- `scripts\scan-secrets.js` — Secret scanner with defensive error handling
+- `bin/install.js:243-248, 293-314` - Settings parsing
+- `scripts/scan-secrets.js:20-25, 37-52, 81-95` - Hook error handling
